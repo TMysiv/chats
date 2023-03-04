@@ -1,0 +1,48 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+#wrap{
+    display: none;
+}
+
+.wrap_header{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.wrap_main{
+    display: flex;
+    column-gap: 40px;
+    justify-content: space-evenly;
+    margin-top: 30px;
+}
+.wrap_main_form{
+    display: flex;
+    flex-direction: column;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+}
+
+.form input{
+    width: 100px;
+    margin-top: 10px;
+    background: red;
+    color: white;
+}
+
+#javascript{
+    background: yellow;
+}
+
+#java{
+    background: cornflowerblue;
+}
+
+#python{
+    background: greenyellow;
+}
