@@ -29,7 +29,8 @@
     "@prisma/client": "^4.11.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
-    "socket.io": "^4.6.1"
+    "socket.io": "^4.6.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

@@ -7,9 +7,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Users {
+  id          String     @id @default(uuid())
+  fullName    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  messages    Messages[]
+}
+
 model Chats {
   id          String     @id @default(uuid())
-  room        String
-  username    String
+  members     String[]
+  chatName    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  messages    Messages[]
+}
+
+model Messages {
+  id          String     @id @default(uuid())
+  text        String
+  user        Users      @relation(fields: [user_id], references: [id])
+  user_id     String
+  chat        Chats      @relation(fields: [chat_id], references: [id])
+  chat_id     String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
