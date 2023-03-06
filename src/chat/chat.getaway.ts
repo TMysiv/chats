@@ -1,7 +1,5 @@
 import {
-    ConnectedSocket,
-    MessageBody,
-    OnGatewayConnection, OnGatewayDisconnect,
+    OnGatewayConnection,
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer
@@ -11,15 +9,12 @@ import {ChatService} from "./chat.service";
 import {UserService} from "../user/user.service";
 import {IJoinRoom} from "./interfaces/join-room.interface";
 import {IUser} from "../user/interfaces/user.interface";
+import {MessageService} from "../message/message.service";
 
-@WebSocketGateway({
-    cors: {
-        origin: '*'
-    }
-})
-export class ChatGetaway implements OnGatewayConnection, OnGatewayDisconnect{
+@WebSocketGateway()
+export class ChatGetaway implements OnGatewayConnection{
 
-    constructor(private chatService:ChatService, private userService: UserService) {}
+    constructor(private chatService:ChatService, private userService: UserService, private messageService: MessageService) {}
 
     @WebSocketServer()
     io: Server;
@@ -62,27 +57,15 @@ export class ChatGetaway implements OnGatewayConnection, OnGatewayDisconnect{
         }
 
 
-        socket.on('chat message', (message: string) => {
+        socket.on('chat message', async (message: string) => {
             this.io.to(room).emit('message', {fullName: this.userFromDb.fullName, message})
+            await this.messageService.createMessage(message, room, this.userFromDb.id);
         })
 
-        // socket.on('disconnect',async () => {
-        //     this.io.to(room).emit('message', {username: 'Bot', text: `${username} has left group`})
-        //     await this.chatService.deleteUserFromChat(socket.id);
-        //     this.io.to(room).emit('roomUsers',{room, users})
-        // })
+        socket.on('disconnect',async () => {
+            this.io.to(room).emit('message',  `${this.userFromDb.fullName} has left group`)
+            await this.chatService.deleteUserFromChat(room, this.userFromDb.id);
+        })
     }
-
-    @SubscribeMessage('chatMessage')
-    async receiveMessage(@MessageBody() message, @ConnectedSocket() socket: Socket) {
-        // const user = await this.chatService.getCurrentUser(socket.id);
-        // this.io.to(user.room).emit('message',{username: user.username, text: message} )
-    }
-
-
-    handleDisconnect(socket: Socket) {
-    }
-
-
 
 }

@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import {PrismaService} from "../services/prisma.service";
 import {IJoinRoom} from "./interfaces/join-room.interface";
 import { v4 as uuidv4 } from 'uuid';
@@ -49,6 +49,33 @@ export class ChatService {
                 members: {
                     push: userId
                 }
+            }
+        })
+    }
+
+    async deleteUserFromChat(roomId: string, userId: string) {
+        const users = await this.getUsersInChat(roomId);
+
+        if (!users) {
+            throw new BadRequestException('room not found')
+        }
+
+        return this.prismaService.chats.update({
+            where: {
+                id: roomId
+            },
+            data: {
+                members: {
+                    set: users.members.filter(user => user !== userId)
+                }
+            }
+        })
+    }
+
+    async getUsersInChat(roomId: string){
+        return this.prismaService.chats.findFirst({
+            where: {
+                id: roomId
             }
         })
     }
