@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import {PrismaService} from "../services/prisma.service";
+import { PrismaService } from '../services/prisma.service';
 
 @Injectable()
 export class MessageService {
-
     constructor(private prismaService: PrismaService) {
     }
 
@@ -12,16 +11,16 @@ export class MessageService {
             data: {
                 text: message,
                 chat_id: roomId,
-                user_id: userId
-            }
-        })
+                user_id: userId,
+            },
+        });
     }
 
     async getChatsMessages(roomId: string) {
         return this.prismaService.messages.findMany({
             where: {
-                chat_id: roomId
-            }
-        })
+                chat_id: roomId,
+            },
+        });
     }
 }
