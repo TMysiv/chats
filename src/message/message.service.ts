@@ -6,7 +6,7 @@ export class MessageService {
     constructor(private prismaService: PrismaService) {
     }
 
-    async createMessage(message, roomId: string, userId: string) {
+    async createMessage(message: string, roomId: string, userId: string) {
         return this.prismaService.messages.create({
             data: {
                 text: message,
