@@ -80,12 +80,26 @@ private chatService:ChatService,
     async createMessage(@ConnectedSocket() socket: SocketExtends, @MessageBody() data: ICreateMessage) {
         this.io.to(data.room).emit('message', { fullName: socket.user.fullName, message: data.message });
         await this.messageService.createMessage(data.message, data.room, socket.user.id);
+        await this.sendNotifications(data.room, socket, data.message);
     }
 
     @SubscribeMessage('leave room')
     async leaveRoom(@ConnectedSocket() socket: SocketExtends, @MessageBody() data) {
         socket.broadcast.to(data.room).emit('message', `${socket.user.fullName} has left group`);
         await this.chatService.deleteUserFromChat(data.room, socket.user.id);
+    }
+
+    async sendNotifications(room: string, socket: SocketExtends, message: string) {
+        const onlineUsersInChat = this.io.sockets.adapter.rooms.get(room).size;
+        const usersInChat = await this.chatService.getUsersInChat(room);
+
+        if (usersInChat.members.length > onlineUsersInChat) {
+            const offlineUser = usersInChat.members.filter(member => member !== socket.user.id);
+            for (let i = 0; i < offlineUser.length; i++) {
+                socket.broadcast.emit('notifications', {user: offlineUser[i], message })
+            }
+        }
+
     }
 
     async handleDisconnect(socket: SocketExtends) {
